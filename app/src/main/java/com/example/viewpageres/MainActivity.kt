@@ -1,12 +1,13 @@
 package com.example.viewpageres
 
 import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
-import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -14,8 +15,6 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.example.viewpageres.databinding.ActivityMainBinding
-import android.content.SharedPreferences
-import android.system.Os.remove
 
 
 class MainActivity : AppCompatActivity() {
@@ -48,6 +47,10 @@ class MainActivity : AppCompatActivity() {
         val mShared = sharedPref.getString(APP_PREFERENCES_NAME,"")
         if(mShared!!.isNotEmpty()) {
             WorkManager.getInstance(applicationContext).cancelAllWorkByTag(mShared);
+
+            /*val serviceIntent = Intent(this, ForegroundService::class.java)
+            stopService(serviceIntent)*/
+
             sharedPref.edit().remove(APP_PREFERENCES_NAME).apply()
             sharedPref.edit().clear().apply()
             Toast.makeText(applicationContext,"Clear",Toast.LENGTH_LONG).show()
@@ -63,9 +66,13 @@ class MainActivity : AppCompatActivity() {
             .getInstance(this)
             .enqueue(uploadWorkRequest);
 
+        /*val serviceIntent = Intent(this, ForegroundService::class.java)
+        ContextCompat.startForegroundService(this, serviceIntent)*/
+
         sharedPref.edit().putString(APP_PREFERENCES_NAME,uploadWorkRequest.id.toString()).apply()
+        //sharedPref.edit().putString(APP_PREFERENCES_NAME,"1").apply()
         Toast.makeText(applicationContext,"Stop",Toast.LENGTH_LONG).show()
-        Toast.makeText(applicationContext,sharedPref.getString(APP_PREFERENCES_NAME,""),Toast.LENGTH_LONG).show()
+
         super.onStop()
     }
 
